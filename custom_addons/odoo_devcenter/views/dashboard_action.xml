@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_devcenter_dashboard" model="ir.actions.client">
+        <field name="name">DevCenter Dashboard</field>
+        <field name="tag">devcenter_dashboard</field>
+    </record>
+
+    <menuitem id="menu_devcenter_root" name="DevCenter" sequence="1"/>
+    
+    <menuitem id="menu_devcenter_dashboard" 
+              name="Dashboard" 
+              parent="menu_devcenter_root" 
+              action="action_devcenter_dashboard" 
+              sequence="1"/>
+</odoo>

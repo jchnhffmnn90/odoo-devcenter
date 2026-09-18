@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="odoo_devcenter.Dashboard" owl="1">
+        <div class="o_devcenter_dashboard container-fluid py-4">
+            <h1 class="mb-4">Odoo DevCenter Dashboard</h1>
+            
+            <t t-if="state.loading">
+                <div class="alert alert-info">Loading metrics...</div>
+            </t>
+            
+            <t t-else="">
+                <div class="row">
+                    <!-- Odoo Metrics -->
+                    <div class="col-md-4">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Odoo Process</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        CPU
+                                        <span class="badge bg-secondary rounded-pill"><t t-esc="state.metrics.odoo.cpu"/> %</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        RAM
+                                        <span class="badge bg-secondary rounded-pill"><t t-esc="state.metrics.odoo.mem"/> MB</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Disk I/O (R/W)
+                                        <span class="badge bg-secondary rounded-pill"><t t-esc="state.metrics.odoo.read_mb"/> / <t t-esc="state.metrics.odoo.write_mb"/> MB</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Files / Conns
+                                        <span class="badge bg-secondary rounded-pill"><t t-esc="state.metrics.odoo.open_files"/> / <t t-esc="state.metrics.odoo.connections"/></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Postgres Metrics -->
+                    <div class="col-md-4">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">PostgreSQL Process</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        CPU
+                                        <span class="badge bg-secondary rounded-pill"><t t-esc="state.metrics.postgres.cpu"/> %</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        RAM
+                                        <span class="badge bg-secondary rounded-pill"><t t-esc="state.metrics.postgres.mem"/> MB</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Disk I/O (R/W)
+                                        <span class="badge bg-secondary rounded-pill"><t t-esc="state.metrics.postgres.read_mb"/> / <t t-esc="state.metrics.postgres.write_mb"/> MB</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Files / Conns
+                                        <span class="badge bg-secondary rounded-pill"><t t-esc="state.metrics.postgres.open_files"/> / <t t-esc="state.metrics.postgres.connections"/></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Metrics -->
+                    <div class="col-md-4">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">System Overall</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        System CPU
+                                        <span class="badge bg-secondary rounded-pill"><t t-esc="state.metrics.system.cpu"/> %</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        System RAM
+                                        <span class="badge bg-secondary rounded-pill"><t t-esc="state.metrics.system.ram"/> %</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>
