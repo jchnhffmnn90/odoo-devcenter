@@ -51,7 +51,7 @@ def get_process_metrics(keyword):
 
 
 class DevCenterController(http.Controller):
-    @http.route("/devcenter/metrics", type="json", auth="user")
+    @http.route("/devcenter/metrics", type="jsonrpc", auth="user")
     def get_metrics(self):
         odoo_metrics = get_process_metrics("odoo-bin")
         pg_metrics = get_process_metrics("postgres")
@@ -64,7 +64,7 @@ class DevCenterController(http.Controller):
             "system": {"cpu": sys_cpu, "ram": sys_ram},
         }
 
-    @http.route("/devcenter/logs", type="json", auth="user")
+    @http.route("/devcenter/logs", type="jsonrpc", auth="user")
     def get_logs(self, lines=100):
         import os
 
@@ -86,7 +86,7 @@ class DevCenterController(http.Controller):
         except Exception as e:
             return {"logs": str(e)}
 
-    @http.route("/devcenter/run_tests", type="json", auth="user")
+    @http.route("/devcenter/run_tests", type="jsonrpc", auth="user")
     def run_tests(self, module="shopify_odoo_connector"):
         import subprocess
         import os
