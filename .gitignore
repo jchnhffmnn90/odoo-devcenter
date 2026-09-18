@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Odoo specific
+odoo-19.0/
+data/
+odoo.log
+odoo.pid
+filestore/
+sessions/
+custom_addons/.keep
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
