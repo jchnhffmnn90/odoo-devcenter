@@ -42,6 +42,7 @@ class Dashboard(Container):
                 yield MetricWidget("RAM (MB)", id="odoo_ram")
                 yield MetricWidget("Disk IO (R/W MB)", id="odoo_io")
                 yield MetricWidget("Open Files/Conns", id="odoo_files")
+                yield Button("Restart Server", id="restart_server", variant="warning")
             with Vertical(classes="column"):
                 yield Label("[b]PostgreSQL Process[/b]", classes="section-title")
                 yield MetricWidget("CPU", id="pg_cpu")
@@ -80,6 +81,18 @@ class Dashboard(Container):
 
         self.query_one("#sys_cpu").value = f"{sys_metrics['cpu']:.1f} %"
         self.query_one("#sys_ram").value = f"{sys_metrics['ram']:.1f} %"
+
+    async def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "restart_server":
+            self.app.notify("Restarting Server...")
+            self.run_worker(self.restart_server(), thread=True)
+
+    def restart_server(self):
+        import subprocess
+
+        subprocess.run([f"{BASE_DIR}/stop.sh"])
+        subprocess.run([f"{BASE_DIR}/start_bg.sh"])
+        self.app.call_from_thread(self.app.notify, "Server Restarted!")
 
 
 class LogViewer(Container):
