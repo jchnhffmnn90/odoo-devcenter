@@ -6,7 +6,7 @@ const { Component, useState, onWillStart, onWillUnmount } = owl;
 
 export class DevCenterDashboard extends Component {
     setup() {
-        this.rpc = useService("rpc");
+        this.rpc = this.env.services.rpc;
         this.state = useState({
             activeTab: "metrics",
             metrics: null,
