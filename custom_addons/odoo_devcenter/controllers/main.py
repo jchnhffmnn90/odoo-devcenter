@@ -95,16 +95,30 @@ class DevCenterController(http.Controller):
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         )
 
-        cmd = [
-            f"{base_dir}/venv/bin/python",
-            f"{base_dir}/odoo-19.0/odoo-bin",
-            "-c",
-            f"{base_dir}/odoo.conf",
-            "--test-enable",
-            "-i",
-            module,
-            "--stop-after-init",
-        ]
+        target_dir = os.path.join(base_dir, module)
+
+        # If it's a standalone python project with pyproject.toml or a tests folder
+        if os.path.exists(os.path.join(target_dir, "pyproject.toml")) or os.path.exists(
+            os.path.join(target_dir, "tests")
+        ):
+            cmd = [f"{base_dir}/venv/bin/pytest", "-v", target_dir]
+            env = os.environ.copy()
+            env["PYTHONPATH"] = target_dir
+        else:
+            # Fallback to Odoo test runner
+            cmd = [
+                f"{base_dir}/venv/bin/python",
+                f"{base_dir}/odoo-19.0/odoo-bin",
+                "-c",
+                f"{base_dir}/odoo.conf",
+                "--test-enable",
+                "-i",
+                module,
+                "--stop-after-init",
+                "-p",
+                "0",  # Prevent port conflict with running server
+            ]
+            env = os.environ.copy()
 
         try:
             process = subprocess.run(
@@ -113,6 +127,7 @@ class DevCenterController(http.Controller):
                 stderr=subprocess.STDOUT,
                 text=True,
                 timeout=120,
+                env=env,
             )
             return {"output": process.stdout, "returncode": process.returncode}
         except subprocess.TimeoutExpired as e:

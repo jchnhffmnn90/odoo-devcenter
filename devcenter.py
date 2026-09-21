@@ -146,20 +146,33 @@ class TestRunner(Container):
 
     def execute_tests(self):
         import subprocess
+        import os
 
-        cmd = [
-            f"{BASE_DIR}/venv/bin/python",
-            f"{BASE_DIR}/odoo-19.0/odoo-bin",
-            "-c",
-            f"{BASE_DIR}/odoo.conf",
-            "--test-enable",
-            "-i",
-            "shopify_odoo_connector",
-            "--stop-after-init",
-        ]
+        target_dir = os.path.join(BASE_DIR, "shopify_odoo_connector")
+
+        if os.path.exists(os.path.join(target_dir, "pyproject.toml")) or os.path.exists(
+            os.path.join(target_dir, "tests")
+        ):
+            cmd = [f"{BASE_DIR}/venv/bin/pytest", "-v", target_dir]
+            env = os.environ.copy()
+            env["PYTHONPATH"] = target_dir
+        else:
+            cmd = [
+                f"{BASE_DIR}/venv/bin/python",
+                f"{BASE_DIR}/odoo-19.0/odoo-bin",
+                "-c",
+                f"{BASE_DIR}/odoo.conf",
+                "--test-enable",
+                "-i",
+                "shopify_odoo_connector",
+                "--stop-after-init",
+                "-p",
+                "0",
+            ]
+            env = os.environ.copy()
 
         process = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env
         )
         for line in iter(process.stdout.readline, ""):
             self.app.call_from_thread(self.test_output.write_line, line.strip())
