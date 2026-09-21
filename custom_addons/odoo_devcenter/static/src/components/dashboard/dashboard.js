@@ -1,12 +1,11 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
+import { rpc } from "@web/core/network/rpc";
 const { Component, useState, onWillStart, onWillUnmount } = owl;
 
 export class DevCenterDashboard extends Component {
     setup() {
-        this.rpc = this.env.services.rpc;
         this.state = useState({
             activeTab: "metrics",
             metrics: null,
@@ -43,7 +42,7 @@ export class DevCenterDashboard extends Component {
 
     async fetchMetrics() {
         try {
-            const data = await this.rpc("/devcenter/metrics", {});
+            const data = await rpc("/devcenter/metrics", {});
             this.state.metrics = data;
             this.state.loadingMetrics = false;
         } catch (error) {
@@ -53,7 +52,7 @@ export class DevCenterDashboard extends Component {
     
     async fetchLogs() {
         try {
-            const data = await this.rpc("/devcenter/logs", { lines: 100 });
+            const data = await rpc("/devcenter/logs", { lines: 100 });
             this.state.logs = data.logs;
         } catch (error) {
             console.error("Failed to fetch logs", error);
@@ -66,7 +65,7 @@ export class DevCenterDashboard extends Component {
         this.state.testOutput = "Running tests... Please wait (this may take up to 2 minutes).";
         
         try {
-            const data = await this.rpc("/devcenter/run_tests", { module: this.state.testModule });
+            const data = await rpc("/devcenter/run_tests", { module: this.state.testModule });
             this.state.testOutput = data.output;
             this.state.testReturnCode = data.returncode;
         } catch (error) {
