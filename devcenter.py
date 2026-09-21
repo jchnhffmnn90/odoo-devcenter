@@ -42,6 +42,7 @@ class Dashboard(Container):
                 yield MetricWidget("RAM (MB)", id="odoo_ram")
                 yield MetricWidget("Disk IO (R/W MB)", id="odoo_io")
                 yield MetricWidget("Open Files/Conns", id="odoo_files")
+                yield Button("Restart Server", id="restart_server", variant="warning")
             with Vertical(classes="column"):
                 yield Label("[b]PostgreSQL Process[/b]", classes="section-title")
                 yield MetricWidget("CPU", id="pg_cpu")
@@ -80,6 +81,18 @@ class Dashboard(Container):
 
         self.query_one("#sys_cpu").value = f"{sys_metrics['cpu']:.1f} %"
         self.query_one("#sys_ram").value = f"{sys_metrics['ram']:.1f} %"
+
+    async def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "restart_server":
+            self.app.notify("Restarting Server...")
+            self.run_worker(self.restart_server(), thread=True)
+
+    def restart_server(self):
+        import subprocess
+
+        subprocess.run([f"{BASE_DIR}/stop.sh"])
+        subprocess.run([f"{BASE_DIR}/start_bg.sh"])
+        self.app.call_from_thread(self.app.notify, "Server Restarted!")
 
 
 class LogViewer(Container):
@@ -133,20 +146,33 @@ class TestRunner(Container):
 
     def execute_tests(self):
         import subprocess
+        import os
 
-        cmd = [
-            f"{BASE_DIR}/venv/bin/python",
-            f"{BASE_DIR}/odoo-19.0/odoo-bin",
-            "-c",
-            f"{BASE_DIR}/odoo.conf",
-            "--test-enable",
-            "-i",
-            "shopify_odoo_connector",
-            "--stop-after-init",
-        ]
+        target_dir = os.path.join(BASE_DIR, "shopify_odoo_connector")
+
+        if os.path.exists(os.path.join(target_dir, "pyproject.toml")) or os.path.exists(
+            os.path.join(target_dir, "tests")
+        ):
+            cmd = [f"{BASE_DIR}/venv/bin/pytest", "-v", target_dir]
+            env = os.environ.copy()
+            env["PYTHONPATH"] = target_dir
+        else:
+            cmd = [
+                f"{BASE_DIR}/venv/bin/python",
+                f"{BASE_DIR}/odoo-19.0/odoo-bin",
+                "-c",
+                f"{BASE_DIR}/odoo.conf",
+                "--test-enable",
+                "-i",
+                "shopify_odoo_connector",
+                "--stop-after-init",
+                "-p",
+                "0",
+            ]
+            env = os.environ.copy()
 
         process = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env
         )
         for line in iter(process.stdout.readline, ""):
             self.app.call_from_thread(self.test_output.write_line, line.strip())
